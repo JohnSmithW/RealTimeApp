@@ -15,13 +15,13 @@ const initialState = {
 export default function productTable(state = initialState, action) {
   switch (action.type) {
     case 'SAVE_AMOUNT':
-      let newState = state.products;
-      newState[action.payload.id].amount = action.payload.value;
+      let newState = [...state.products];
+      newState[action.payload.id].amount = Number(action.payload.value);
       return { ...state, products: newState };
 
     case 'SAVE_PRICE':
-      newState = state.products;
-      newState[action.payload.id].priceForOne = action.payload.value;
+      newState = [...state.products];
+      newState[action.payload.id].priceForOne = Number(action.payload.value);
       return { ...state, products: newState };
     default:
       return state;
