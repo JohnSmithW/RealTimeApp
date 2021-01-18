@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { shallowEqual, useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import './ProductTable.scss';
 import { saveAmount, savePrice } from '../../actions/saveFields';
 import ProductTableField from '../ProductTableField/ProductTableField';

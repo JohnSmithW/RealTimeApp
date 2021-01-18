@@ -19,7 +19,8 @@
     "dev-mode": "npm-run-all --parallel start:dev eslint stylelint watch",
     "run-webpack": "webpack --mode development",
     "build": "npm-run-all -p stylelint eslint run-webpack",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "start": "nodemon start server/app.js"
   },
   "eslintConfig": {
     "extends": [
@@ -50,6 +51,7 @@
     "gh-pages": "^2.2.0",
     "html-webpack-plugin": "^3.2.0",
     "mini-css-extract-plugin": "^0.9.0",
+    "nodemon": "^2.0.7",
     "npm-run-all": "^4.1.5",
     "npm-watch": "^0.7.0",
     "optimize-css-assets-webpack-plugin": "^5.0.4",
@@ -66,12 +68,15 @@
   },
   "dependencies": {
     "@risingstack/react-easy-state": "^6.3.0",
+    "express": "^4.17.1",
     "node-sass": "^4.14.1",
     "prop-types": "^15.7.2",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-redux": "^7.2.2",
     "redux": "^4.0.5",
-    "redux-devtools-extension": "^2.13.8"
-  }
+    "redux-devtools-extension": "^2.13.8",
+    "socket.io": "^3.1.0"
+  },
+  "proxy": "http://127.0.0.1:8010/"
 }
