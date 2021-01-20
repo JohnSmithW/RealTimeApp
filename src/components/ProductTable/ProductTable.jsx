@@ -1,3 +1,4 @@
+import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import './ProductTable.scss';
 import { saveAmount, savePrice } from '../../actions/saveFields';
@@ -24,7 +25,15 @@ function ProductTable() {
   }
 
   return (
-    <div className="product-table">
+    <div
+      onMouseMove={() => {
+        // let rect = event.target.getBoundingClientRect();
+        // var x = event.clientX - rect.left;
+        // var y = event.clientY - rect.top;
+        // console.log('Left? : ' + x + ' ; Top? : ' + y + '.');
+      }}
+      className="product-table"
+    >
       <table className="product-table-main">
         <tbody>
           <tr className="product-table-main__row">

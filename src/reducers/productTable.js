@@ -23,6 +23,7 @@ export default function productTable(state = initialState, action) {
       newState = [...state.products];
       newState[action.payload.id].priceForOne = Number(action.payload.value);
       return { ...state, products: newState };
+
     default:
       return state;
   }

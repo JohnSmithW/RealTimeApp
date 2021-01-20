@@ -1,7 +1,21 @@
-import { createStore } from 'redux';
-import { devToolsEnhancer } from 'redux-devtools-extension';
+import { createStore, applyMiddleware } from 'redux';
+import createSocketIoMiddleware from 'redux-socket.io';
+import io from 'socket.io-client';
+import { composeWithDevTools } from 'redux-devtools-extension';
 import app from './reducers/reducers';
 
-const state = createStore(app, devToolsEnhancer());
+const socket = io('http://localhost:8010', {
+  withCredentials: true,
+  extraHeaders: {
+    'my-custom-header': 'web',
+  },
+});
+const socketIoMiddleware = createSocketIoMiddleware(socket, 'server/');
+
+const state = createStore(app, composeWithDevTools(applyMiddleware(socketIoMiddleware)));
+
+state.subscribe(() => {
+  console.log('new client state', state.getState());
+});
 
 export default state;

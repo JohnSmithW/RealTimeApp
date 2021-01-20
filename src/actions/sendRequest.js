@@ -1,13 +1,15 @@
-const sendRequest = async function (
+const sendRequest = async (
   url,
   method = 'GET',
   body,
   header = {
     'Content-Type': 'application/json',
   },
-) {
+) => {
+  /* eslint-disable */
   const response = await fetch(url, {
-    method: method,
+    /* eslint-enable */
+    method,
     headers: header,
     body: JSON.stringify(body),
   });
