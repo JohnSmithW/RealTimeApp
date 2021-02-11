@@ -17,7 +17,7 @@ export default function productTable(state = initialState, action) {
     case 'SAVE_AMOUNT':
       let newState = [...state.products];
       newState[action.payload.id].amount = Number(action.payload.value);
-      return { ...state, products: newState };
+      return { ...state, products: [...newState] };
 
     case 'SAVE_PRICE':
       newState = [...state.products];

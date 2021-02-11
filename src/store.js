@@ -14,8 +14,6 @@ const socketIoMiddleware = createSocketIoMiddleware(socket, 'server/');
 
 const state = createStore(app, composeWithDevTools(applyMiddleware(socketIoMiddleware)));
 
-state.subscribe(() => {
-  console.log('new client state', state.getState());
-});
+state.subscribe(() => {});
 
 export default state;
