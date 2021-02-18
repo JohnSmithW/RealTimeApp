@@ -10,8 +10,8 @@ const socket = io('http://localhost:8010', {
     'my-custom-header': 'web',
   },
 });
-const socketIoMiddleware = createSocketIoMiddleware(socket, 'server/');
 
+const socketIoMiddleware = createSocketIoMiddleware(socket, 'server/');
 const state = createStore(app, composeWithDevTools(applyMiddleware(socketIoMiddleware)));
 
 state.subscribe(() => {});

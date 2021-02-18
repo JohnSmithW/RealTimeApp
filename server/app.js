@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 const server = require('http').Server(app);
+// const { applyOperation } = require('fast-json-patch');
+// const applyOperation = require('fast-json-patch').applyOperation;
 const io = require('socket.io')(server, {
   cors: {
     origin: 'http://localhost:9000',
@@ -13,34 +15,76 @@ const io = require('socket.io')(server, {
 const fs = require('fs');
 const port = 8010;
 
-// fs.readFile('users.json', function (err, data) {
-//   const users = JSON.parse(data);
-//   users.push({ id: 0, x: 0, y: 0 });
-
-//   fs.writeFile('users.json', JSON.stringify(users), (err) => {
-//     if (err) throw err;
-//   });
-// });
-
 io.attach(server);
 io.on('connection', function (socket) {
-  // users.push({ id: socket.id });
+  fs.readFile('db.json', function (err, data) {
+    const db = JSON.parse(data);
+
+    db.users.push({ id: socket.id, x: 0, y: 0 });
+
+    io.sockets.emit('action', { type: 'LOAD_TABLE', payload: db.table });
+    fs.writeFile('db.json', JSON.stringify(db), (err) => {
+      if (err) throw err;
+    });
+  });
 
   socket.emit('action', { type: 'CONNECT', payload: { id: socket.id } });
   io.sockets.emit('action', { type: 'CONNECT_USERS', payload: { id: socket.id, x: 0, y: 0 } });
 
   socket.on('action', (action) => {
     if (action.type === 'server/SAVE_AMOUNT') {
-      io.sockets.emit('action', { type: 'SAVE_AMOUNT', payload: action.payload });
+      fs.readFile('db.json', function (err, data) {
+        const db = JSON.parse(data);
+
+        let newDB = [...db.table];
+        newDB[action.payload.id].amount = Number(action.payload.value);
+
+        fs.writeFile('db.json', JSON.stringify({ ...db, table: [...newDB] }), (err) => {
+          if (err) throw err;
+        });
+
+        io.sockets.emit('action', { type: 'LOAD_TABLE', payload: newDB });
+      });
     }
 
     if (action.type === 'server/SAVE_PRICE') {
-      io.sockets.emit('action', { type: 'SAVE_PRICE', payload: action.payload });
+      fs.readFile('db.json', function (err, data) {
+        const db = JSON.parse(data);
+
+        let newDB = [...db.table];
+
+        newDB[action.payload.id].priceForOne = Number(action.payload.value);
+
+        fs.writeFile('db.json', JSON.stringify({ ...db, table: newDB }), (err) => {
+          if (err) throw err;
+        });
+
+        io.sockets.emit('action', { type: 'LOAD_TABLE', payload: newDB });
+      });
     }
 
     if (action.type === 'server/SEND_COORDINATES') {
       io.sockets.emit('action', { type: 'GET_COORDINATES', payload: action.payload });
     }
+  });
+
+  socket.on('disconnect', function () {
+    fs.readFile('db.json', function (err, data) {
+      let db = JSON.parse(data);
+      const newUsers = db.users;
+      db.users.forEach((user) => {
+        if (user.id === socket.id) {
+          const index = newUsers.indexOf(user);
+          newUsers.splice(index, 1);
+        }
+      });
+
+      db = { ...db, users: newUsers };
+
+      fs.writeFile('db.json', JSON.stringify(db), (err) => {
+        if (err) throw err;
+      });
+    });
   });
 });
 

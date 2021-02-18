@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 
-export default function ProductTableField({ tableValue, onBlur }) {
+export default function ProductTableField({ tableValue, onDoubleClick, onBlur }) {
   const [value, setValue] = useState(tableValue);
   const [isDisabled, setIsDisabled] = useState(true);
   const inputRef = useRef(null);
@@ -10,6 +10,7 @@ export default function ProductTableField({ tableValue, onBlur }) {
       onDoubleClick={() => {
         setIsDisabled(false);
         inputRef.current.focus();
+        onDoubleClick();
       }}
     >
       <input

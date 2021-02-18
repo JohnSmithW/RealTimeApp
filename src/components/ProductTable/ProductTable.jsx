@@ -2,10 +2,12 @@ import React, { useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import './ProductTable.scss';
 import { saveAmount, savePrice } from '../../actions/saveFields';
+import { highlightAmountField, highlightPriceField } from '../../actions/highlightField';
 import sendCoordinates from '../../actions/sendCoordinates';
 import ProductTableField from '../ProductTableField/ProductTableField';
 import ProductTableFieldTotal from '../ProductTableFieldTotal/ProductTableFieldTotal';
 import UserCursor from '../UserCursor/UserCursor';
+import countTotal from '../../helper/products';
 
 function ProductTable() {
   const headers = useSelector((state) => state.productTable.headers);
@@ -15,20 +17,6 @@ function ProductTable() {
   const tableRef = useRef();
 
   const dispatch = useDispatch();
-
-  function countTotal() {
-    let list = [];
-    let total = null;
-    for (let i = 0; i < products.length; i += 1) {
-      list.push(products[i].amount * products[i].priceForOne);
-    }
-
-    for (let i = 0; i < list.length; i += 1) {
-      total += list[i];
-    }
-
-    return total;
-  }
 
   return (
     <div
@@ -66,6 +54,9 @@ function ProductTable() {
                 </td>
                 <ProductTableField
                   tableValue={amount}
+                  onDoubleClick={() => {
+                    dispatch(highlightAmountField(id));
+                  }}
                   onBlur={(value) => {
                     dispatch(saveAmount(id, value));
                   }}
@@ -73,6 +64,9 @@ function ProductTable() {
 
                 <ProductTableField
                   tableValue={priceForOne}
+                  onDoubleClick={() => {
+                    dispatch(highlightPriceField(id));
+                  }}
                   onBlur={(value) => {
                     dispatch(savePrice(id, value));
                   }}
@@ -87,7 +81,7 @@ function ProductTable() {
 
       <div className="product-table__divider" />
 
-      <div className="product-table__total">{'Total: ' + countTotal()}</div>
+      <div className="product-table__total">{'Total: ' + countTotal(products)}</div>
     </div>
   );
 }

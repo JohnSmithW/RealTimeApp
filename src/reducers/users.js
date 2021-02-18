@@ -15,7 +15,6 @@ export default function users(state = initialState, action) {
       return { ...newState, users: newState.users };
     /* eslint-disable */
     case 'GET_COORDINATES':
-      console.log(state.user);
       newState = { ...state };
 
       newState.users.map((user) => {
