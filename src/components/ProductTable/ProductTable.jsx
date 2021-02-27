@@ -1,13 +1,17 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import io from 'socket.io-client';
 import './ProductTable.scss';
-import { saveAmount, savePrice } from '../../actions/saveFields';
-import { highlightAmountField, highlightPriceField } from '../../actions/highlightField';
-import sendCoordinates from '../../actions/sendCoordinates';
+import loadTable from '../../actions/loadTable';
+import { editAmount, editPrice } from '../../actions/editFields';
+import getCoordinates from '../../actions/getCoordinates';
 import ProductTableField from '../ProductTableField/ProductTableField';
 import ProductTableFieldTotal from '../ProductTableFieldTotal/ProductTableFieldTotal';
 import UserCursor from '../UserCursor/UserCursor';
 import countTotal from '../../helper/products';
+import { connectUser, connectUsers } from '../../actions/users';
+
+const socket = io('http://localhost:8010');
 
 function ProductTable() {
   const headers = useSelector((state) => state.productTable.headers);
@@ -18,6 +22,33 @@ function ProductTable() {
 
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    socket.on('loadTable', (table) => {
+      dispatch(loadTable(table));
+    });
+
+    socket.on('editAmount', (data) => {
+      dispatch(editAmount(data.id, data.value));
+    });
+
+    socket.on('editPrice', (data) => {
+      dispatch(editPrice(data.id, data.value));
+    });
+
+    socket.on('getCoordinates', (data) => {
+      dispatch(getCoordinates(data));
+    });
+
+    socket.on('connectUser', (data) => {
+      dispatch(connectUser(data));
+    });
+
+    socket.on('connectUsers', (data) => {
+      console.log(data, 'data');
+      dispatch(connectUsers(data));
+    });
+  }, []);
+
   return (
     <div
       ref={tableRef}
@@ -26,7 +57,7 @@ function ProductTable() {
         var x = event.clientX - rect.left;
         var y = event.clientY - rect.top;
 
-        dispatch(sendCoordinates(users.user, x, y));
+        socket.emit('sendCoordinates', { id: users.user, x, y });
       }}
       className="product-table"
     >
@@ -54,21 +85,15 @@ function ProductTable() {
                 </td>
                 <ProductTableField
                   tableValue={amount}
-                  onDoubleClick={() => {
-                    dispatch(highlightAmountField(id));
-                  }}
                   onBlur={(value) => {
-                    dispatch(saveAmount(id, value));
+                    socket.emit('saveAmount', { id, value });
                   }}
                 />
 
                 <ProductTableField
                   tableValue={priceForOne}
-                  onDoubleClick={() => {
-                    dispatch(highlightPriceField(id));
-                  }}
                   onBlur={(value) => {
-                    dispatch(savePrice(id, value));
+                    socket.emit('savePrice', { id, value });
                   }}
                 />
 

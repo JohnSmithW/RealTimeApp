@@ -1,16 +1,20 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
-export default function ProductTableField({ tableValue, onDoubleClick, onBlur }) {
+export default function ProductTableField({ tableValue, onBlur }) {
   const [value, setValue] = useState(tableValue);
   const [isDisabled, setIsDisabled] = useState(true);
   const inputRef = useRef(null);
+
+  useEffect(() => {
+    setValue(tableValue);
+  }, [tableValue]);
 
   return (
     <td
       onDoubleClick={() => {
         setIsDisabled(false);
         inputRef.current.focus();
-        onDoubleClick();
+        setIsDisabled(!isDisabled);
       }}
     >
       <input

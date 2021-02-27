@@ -9,6 +9,7 @@ export default function users(state = initialState, action) {
       return { ...newState, user: newState.user };
 
     case 'CONNECT_USERS':
+      console.log(action.payload);
       newState = { ...state };
       newState.users.push({ id: action.payload.id, x: action.payload.x, y: action.payload.y });
 

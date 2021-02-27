@@ -22,50 +22,48 @@ io.on('connection', function (socket) {
 
     db.users.push({ id: socket.id, x: 0, y: 0 });
 
-    io.sockets.emit('action', { type: 'LOAD_TABLE', payload: db.table });
+    io.sockets.emit('loadTable', db.table);
     fs.writeFile('db.json', JSON.stringify(db), (err) => {
       if (err) throw err;
     });
   });
 
-  socket.emit('action', { type: 'CONNECT', payload: { id: socket.id } });
-  io.sockets.emit('action', { type: 'CONNECT_USERS', payload: { id: socket.id, x: 0, y: 0 } });
+  socket.emit('connectUser', { id: socket.id });
+  io.sockets.emit('connectUsers', { id: socket.id, x: 0, y: 0 });
 
-  socket.on('action', (action) => {
-    if (action.type === 'server/SAVE_AMOUNT') {
-      fs.readFile('db.json', function (err, data) {
-        const db = JSON.parse(data);
+  socket.on('saveAmount', (payload) => {
+    fs.readFile('db.json', function (err, data) {
+      const db = JSON.parse(data);
 
-        let newDB = [...db.table];
-        newDB[action.payload.id].amount = Number(action.payload.value);
+      let newDB = [...db.table];
+      newDB[payload.id].amount = Number(payload.value);
 
-        fs.writeFile('db.json', JSON.stringify({ ...db, table: [...newDB] }), (err) => {
-          if (err) throw err;
-        });
-
-        io.sockets.emit('action', { type: 'LOAD_TABLE', payload: newDB });
+      fs.writeFile('db.json', JSON.stringify({ ...db, table: [...newDB] }), (err) => {
+        if (err) throw err;
       });
-    }
 
-    if (action.type === 'server/SAVE_PRICE') {
-      fs.readFile('db.json', function (err, data) {
-        const db = JSON.parse(data);
+      io.sockets.emit('editAmount', payload);
+    });
+  });
 
-        let newDB = [...db.table];
+  socket.on('savePrice', (payload) => {
+    fs.readFile('db.json', function (err, data) {
+      const db = JSON.parse(data);
 
-        newDB[action.payload.id].priceForOne = Number(action.payload.value);
+      let newDB = [...db.table];
 
-        fs.writeFile('db.json', JSON.stringify({ ...db, table: newDB }), (err) => {
-          if (err) throw err;
-        });
+      newDB[payload.id].priceForOne = Number(payload.value);
 
-        io.sockets.emit('action', { type: 'LOAD_TABLE', payload: newDB });
+      fs.writeFile('db.json', JSON.stringify({ ...db, table: newDB }), (err) => {
+        if (err) throw err;
       });
-    }
 
-    if (action.type === 'server/SEND_COORDINATES') {
-      io.sockets.emit('action', { type: 'GET_COORDINATES', payload: action.payload });
-    }
+      io.sockets.emit('editPrice', payload);
+    });
+  });
+
+  socket.on('sendCoordinates', (payload) => {
+    io.sockets.emit('getCoordinates', payload);
   });
 
   socket.on('disconnect', function () {
